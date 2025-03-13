@@ -9,7 +9,7 @@ void main() async {
 
 void startServer() async {
   var server = await HttpServer.bind(InternetAddress.loopbackIPv4, 8080)
-    ..idleTimeout = Duration(seconds: 2, milliseconds: 500);
+    ..idleTimeout = Duration(milliseconds: 250);
   print('Server running on http://${server.address.host}:${server.port}');
 
   await for (HttpRequest request in server) {
@@ -30,7 +30,7 @@ void startServer() async {
 
 Future<void> _keepCallingServer() async {
   final client = HttpClient()..idleTimeout = Duration(seconds: 15);
-  for (var i = 0; i < 15; i++) {
+  for (var i = 0; i < 200; i++) {
     try {
       print('${DateTime.now()} Request now');
       final request = await client.get('localhost', 8080, '/hello');
@@ -45,6 +45,6 @@ Future<void> _keepCallingServer() async {
     } catch (e) {
       print(e);
     }
-    await Future<void>.delayed(const Duration(seconds: 4, milliseconds: 980));
+    await Future<void>.delayed(const Duration(milliseconds: 485));
   }
 }
