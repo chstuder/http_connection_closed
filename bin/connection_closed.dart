@@ -2,14 +2,17 @@ import 'dart:convert';
 import 'dart:io';
 
 void main() async {
-  startServer();
+  int idleTimeoutInMs = 500;
+  startServer(idleTimeout: idleTimeoutInMs);
 
-  await _keepCallingServer();
+  int waitBetweenRequestsInMs = 485;
+  await _keepCallingServer(waitBetweenRequests: waitBetweenRequestsInMs);
 }
 
-void startServer() async {
+void startServer({required int idleTimeout}) async {
+  final serverIdleTimeout = (idleTimeout / 2).toInt();
   var server = await HttpServer.bind(InternetAddress.loopbackIPv4, 8080)
-    ..idleTimeout = Duration(milliseconds: 250);
+    ..idleTimeout = Duration(milliseconds: serverIdleTimeout);
   print('Server running on http://${server.address.host}:${server.port}');
 
   await for (HttpRequest request in server) {
@@ -28,7 +31,7 @@ void startServer() async {
   }
 }
 
-Future<void> _keepCallingServer() async {
+Future<void> _keepCallingServer({required int waitBetweenRequests}) async {
   final client = HttpClient()..idleTimeout = Duration(seconds: 15);
   for (var i = 0; i < 200; i++) {
     try {
@@ -45,6 +48,6 @@ Future<void> _keepCallingServer() async {
     } catch (e) {
       print(e);
     }
-    await Future<void>.delayed(const Duration(milliseconds: 485));
+    await Future<void>.delayed(Duration(milliseconds: waitBetweenRequests));
   }
 }
